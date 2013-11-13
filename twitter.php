@@ -1,7 +1,8 @@
 <?php
     
 
-    $letters = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+    $letters2 = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+	$letters = array('A','B','C','D');
     
     $numberOfUsersPerLetter = 3;
     $stepBetweenUsers = 3;
@@ -9,12 +10,15 @@
     $users = array();
     require_once('./TwitterAPIWrapper.php');
     
-    $settings = array(
-                      'oauth_access_token' => "1058206495-eDSbO00tXNxawv5HOSOnJ5X1bqYWbRACCZVmZTu",
-                      'oauth_access_token_secret' => "MhUGlnFKBtyBCu1pal0yRdRlORwHsTBbEp53HSIDtM",
-                      'consumer_key' => "3HiQdQdwnQsAkcDHxk23Rw",
-                      'consumer_secret' => "ujY0ijb9hNex8OgxcCv3p8Eqpnoyhg0VirbiPr9I"
-                      );
+	// You will need to create a tokens.php file locally with the following lines in it
+//	 $settings = array(
+//                      'oauth_access_token' => "YOURTOKEN",
+//                      'oauth_access_token_secret' => "YOURSECRET",
+//                      'consumer_key' => "YOURKEY",
+//                      'consumer_secret' => "YOUROTHERSECRET"
+//                      );
+	// DO NOT ADD YOUR tokens.php FILE TO GIT VERSION CONTROL!!
+    require_once('./tokens.php');
     
     $twitter = new TwitterAPIExchange($settings);
     
@@ -27,7 +31,19 @@
     // lookup users for each letter
     $usersToRequest = $numberOfUsersPerLetter * $stepBetweenUsers;
     
-    getUsers();
+    $users = getUsers();
+//	print_r($users[0]);
+	
+	$json_obj = 0;
+	$fp = fopen('file.csv', 'a');
+	
+	foreach($users as $user){
+
+		foreach ($json_obj as $fields) {
+			fputcsv($fp, $fields);
+		}
+	} 
+	fclose($fp);
     
     function getUsers(){
         global $letters,$twitter,$usersToRequest,$numberOfUsersPerLetter,$stepBetweenUsers;
