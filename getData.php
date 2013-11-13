@@ -33,6 +33,7 @@ $seedUsers = getSeedUsers($twitter, $numSeedUsers);
 $allUsers = array();
 $depthlimit=3;
 foreach($seedUsers as $user){
+	// TODO: Maybe add follower_of field to each follower?
 	array_merge($allUsers, getUsersFollowers($twitter, $user, $depthlimit));	
 }
 		
@@ -50,7 +51,7 @@ fclose($fp);
 function getUsersFollowers($twitter, $user, $depthlimit=null){
 	$users = array($user);
 	
-	//TODO Impliment this function
+	//TODO: Impliment this function
 	
 	return $users;
 }
