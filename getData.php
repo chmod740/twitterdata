@@ -14,43 +14,28 @@ require_once('./TwitterAPIWrapper.php');
 require_once('./tokens.php');
 
 
-$letters = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
-$small_sample = array('A','B');
-
-$numberOfUsersPerLetter = 3;
-$stepBetweenUsers = 3;
-
+// Make twitter api object
 $twitter = new TwitterAPIExchange($settings);
 
-////    $testURL = 'https://api.twitter.com/1.1/users/lookup.json';
-////    $testgetfield = '?user_id=783214,6483922,746843,6354349';
-//    $testURL = 'https://api.twitter.com/1.1/users/search.json';
-//    $testgetfield = '?q=A&count=1&page=2';
-//    echo $twitter->setGetfield($testgetfield)->buildOauth($testURL, 'GET')->performRequest();
 
-// lookup users for each letter
-$usersToRequest = $numberOfUsersPerLetter * $stepBetweenUsers;
+// Get users by letter
+$letters = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+$a = array('A'); // example for getting a smale sample
+$users = getUsers($twitter, $a, 1, 1);
 
-$users = getUsers();
-//	print_r($users[0]);
-
-
-// Print data to csv
-$json_obj = 0;
-$fp = fopen('data.csv', 'a');
-
-foreach($users as $user){
-
-	foreach ($json_obj as $fields) {
-		fputcsv($fp, $fields);
-	}
-} 
+// Save data as json file
+$fp = fopen('data.json', 'w');
+fwrite($fp, json_encode($users));
 fclose($fp);
 
 
+// ******************************
+// Function definitions...
+// ******************************
 
-function getUsers(){
-	global $letters,$twitter,$usersToRequest,$numberOfUsersPerLetter,$stepBetweenUsers;
+function getUsers($twitter, $letters, $numberOfUsersPerLetter=1, $stepBetweenUsers=1){
+	
+	$usersToRequest = $numberOfUsersPerLetter * $stepBetweenUsers;
 
 	$users = array();
 	foreach($letters as $letter) {
@@ -102,5 +87,16 @@ function selectUsersByStep($users,$numOfUsersToSelect, $step){
 function printUsers($array) {
 	print_r($array);
 }
+
+
+// ***********************
+// Old test code
+// ***********************
+
+////    $testURL = 'https://api.twitter.com/1.1/users/lookup.json';
+////    $testgetfield = '?user_id=783214,6483922,746843,6354349';
+//    $testURL = 'https://api.twitter.com/1.1/users/search.json';
+//    $testgetfield = '?q=A&count=1&page=2';
+//    echo $twitter->setGetfield($testgetfield)->buildOauth($testURL, 'GET')->performRequest();
 
 ?>
