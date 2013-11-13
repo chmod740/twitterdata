@@ -1,9 +1,8 @@
 [id] => 940631
-[id_str] => 940631
 [name] => Andrei Zmievski
 [screen_name] => a
 [location] => San Francisco, CA
-[description] => Coder, photographer, beer judge and brewer, Russian, and San Franciscan. Software architect at @AppDynamics.
+[description] => Coder, photographer, beer judge and brewer, Russian, ....
 [url] => http://t.co/VPi9vzq9Ft
 [protected] => 
 [followers_count] => 93613

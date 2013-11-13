@@ -13,36 +13,59 @@ require_once('./TwitterAPIWrapper.php');
 // DO NOT ADD YOUR tokens.php FILE TO GIT VERSION CONTROL!!
 require_once('./tokens.php');
 
+// Get cmd args
+if (empty($argv[1]) || empty($argv[2])) {
+	die("\nERROR: arg 1 should be the name of the file to save data to. "
+		               . "arg 2 should be one of [a, w] for append or overwrite\n\n"
+					   . "Example: php getData.php data.json w\n\n");
+}
+$jsonFilename = $argv[1];
+$action = $argv[2];
 
 // Make twitter api object
 $twitter = new TwitterAPIExchange($settings);
 
+// Get seed users by letter
+$numSeedUsers = 26;
+$seedUsers = getSeedUsers($twitter, $numSeedUsers);
 
-// Get users by letter
-$letters = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
-$a = array('A'); // example for getting a smale sample
-$users = getUsers($twitter, $a, 1, 1);
-
+// Get seed users followers
+$allUsers = array();
+$depthlimit=3;
+foreach($seedUsers as $user){
+	array_merge($allUsers, getUsersFollowers($twitter, $user, $depthlimit));	
+}
+		
 // Save data as json file
-$fp = fopen('data.json', 'w');
-fwrite($fp, json_encode($users));
+$fp = fopen($jsonFilename, $action);
+fwrite($fp, json_encode($allUsers));
 fclose($fp);
 
 
 // ******************************
-// Function definitions...
+// Function definitions
 // ******************************
 
-function getUsers($twitter, $letters, $numberOfUsersPerLetter=1, $stepBetweenUsers=1){
+
+function getUsersFollowers($twitter, $user, $depthlimit=null){
+	$users = array($user);
 	
-	$usersToRequest = $numberOfUsersPerLetter * $stepBetweenUsers;
+	//TODO Impliment this function
+	
+	return $users;
+}
+
+function getSeedUsers($twitter, $letters, $numUsers=26){
+	$letters = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+	$usersPerLetter = $numUsers/26;
+	$stepBetweenUsers=2;
+	$usersToRequest = $usersPerLetter * $stepBetweenUsers;
 
 	$users = array();
 	foreach($letters as $letter) {
-
-		$usersForLetter = getUsersForLetter($twitter, $letter,$usersToRequest);
-		$selectedUsers = selectUsersByStep($usersForLetter,$numberOfUsersPerLetter, $stepBetweenUsers);
-	   $users = array_merge((array)$users,(array)$selectedUsers);
+		$usersForLetter = getUsersForLetter($twitter, $letter, $usersToRequest);
+		$selectedUsers = selectUsersByStep($usersForLetter, $usersPerLetter, $stepBetweenUsers);
+	   $users = array_merge((array)$users, (array)$selectedUsers);
 	}
 
 	echo 'Retrieved '.count($users).' users from searching by letters'."\n";
@@ -54,9 +77,10 @@ function getUsersForLetter($requestObject, $letter, $usersToRequest) {
 	$searchURL = 'https://api.twitter.com/1.1/users/search.json';
 	$requestMethod = 'GET';
 	$resultsForLetter = array();
-
+	
+	$count = min($usersToRequest, 20);
 	for ($page = 0; $page < 50; $page++){
-		$getfield = '?q='.$letter.'&count=20'.'&page='.$page;
+		$getfield = '?q='.$letter.'&count='.$count.'&page='.$page;
 		$result = json_decode($requestObject->setGetfield($getfield)->buildOauth($searchURL, $requestMethod)->performRequest());
 		$resultsForLetter = array_merge((array)$resultsForLetter, (array)$result);
 		if(count($resultsForLetter) >= $usersToRequest){
@@ -65,12 +89,10 @@ function getUsersForLetter($requestObject, $letter, $usersToRequest) {
 	}
 
 	echo 'Received '.count($resultsForLetter).' Users'."\n";
-
 	return $resultsForLetter;
 }
 
 function selectUsersByStep($users,$numOfUsersToSelect, $step){
-
 	$numOfUsersNeeded = $numOfUsersToSelect*$step;
 	if (count($users)<$numOfUsersNeeded) {
 		echo "Not Enough Users to Select From";
@@ -92,6 +114,7 @@ function printUsers($array) {
 // ***********************
 // Old test code
 // ***********************
+
 
 ////    $testURL = 'https://api.twitter.com/1.1/users/lookup.json';
 ////    $testgetfield = '?user_id=783214,6483922,746843,6354349';
