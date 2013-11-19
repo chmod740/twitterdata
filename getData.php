@@ -51,7 +51,14 @@ fclose($fp);
 function getUsersFollowers($twitter, $user, $depthlimit=null){
 	$users = array($user);
 	
-	//TODO: Impliment this function
+//	echo 'Getting followers for '.$user->id;
+	
+	$query = '?user_id='.$user->id;
+    $url = 'https://api.twitter.com/1.1/followers/list.json';
+    $list = $twitter->setGetfield($query)->buildOauth($url, 'GET')->performRequest();
+    //echo json_decode($list)->users;
+	
+	array_merge($users, json_decode($list)->users);
 	
 	return $users;
 }
@@ -63,11 +70,12 @@ function getSeedUsers($twitter, $letters, $numUsers=26){
 	$usersToRequest = $usersPerLetter * $stepBetweenUsers;
 
 	$users = array();
-	foreach($letters as $letter) {
+	$letter = 'A';
+	//foreach($letters as $letter) {
 		$usersForLetter = getUsersForLetter($twitter, $letter, $usersToRequest);
 		$selectedUsers = selectUsersByStep($usersForLetter, $usersPerLetter, $stepBetweenUsers);
 	   $users = array_merge((array)$users, (array)$selectedUsers);
-	}
+	//}
 
 	echo 'Retrieved '.count($users).' users from searching by letters'."\n";
 	return $users;
