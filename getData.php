@@ -37,6 +37,10 @@ foreach($seedUsers as $user){
 	array_merge($allUsers, getUsersFollowers($twitter, $user, $depthlimit));	
 }
 		
+// add attributes
+foreach($allUsers as $user) {
+    addDateAttributesToUser($user);
+}
 // Save data as json file
 $fp = fopen($jsonFilename, $action);
 fwrite($fp, json_encode($allUsers));
@@ -119,16 +123,32 @@ function printUsers($array) {
 	print_r($array);
 }
 
+function addDateAttributesToUser($user) {
+    $dateStr = $user->created_at;
+    $strArray = explode(' ',$dateStr);
+    $day = $strArray[0];
+    $month = $strArray[1];
+    $date = $strArray[2];
+    $year = $strArray[5];
+    $user ->created_day = $day;
+    $user ->created_month = $month;
+    $user ->created_date = $date;
+    $user ->created_year = $year;
+}
 
 // ***********************
 // Old test code
 // ***********************
 
 
-////    $testURL = 'https://api.twitter.com/1.1/users/lookup.json';
-////    $testgetfield = '?user_id=783214,6483922,746843,6354349';
+
 //    $testURL = 'https://api.twitter.com/1.1/users/search.json';
 //    $testgetfield = '?q=A&count=1&page=2';
-//    echo $twitter->setGetfield($testgetfield)->buildOauth($testURL, 'GET')->performRequest();
+//    $json = $twitter->setGetfield($testgetfield)->buildOauth($testURL, 'GET')->performRequest();
+//    $testUsers = json_decode($json);
+//    foreach($testUsers as $user){
+//        addDateAttributesToUser($user);
+//        echo json_encode($user);
+//    }
 
 ?>
