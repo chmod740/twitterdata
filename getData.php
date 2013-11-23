@@ -59,7 +59,7 @@ function getUsersFollowers($twitter, $user, $depthlimit=null){
 //	echo 'Getting followers for '.$user->id;
 	
 	$query = '?user_id='.$user->id.'&cursor=1&count=10';
-    $url = 'https://api.twitter.com/1.1/followers/ids.json';
+    $url = 'https://api.twitter.com/1.1/followers/list.json';
     $list = $twitter->setGetfield($query)->buildOauth($url, 'GET')->performRequest();
     //print_r(json_decode($list));
 	
