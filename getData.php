@@ -39,6 +39,7 @@ foreach($seedUsers as $user){
 		
 // add attributes
 foreach($allUsers as $user) {
+    parseDateAndUrl($user);
     addDateAttributesToUser($user);
 }
 // Save data as json file
@@ -57,10 +58,10 @@ function getUsersFollowers($twitter, $user, $depthlimit=null){
 	
 //	echo 'Getting followers for '.$user->id;
 	
-	$query = '?user_id='.$user->id;
-    $url = 'https://api.twitter.com/1.1/followers/list.json';
+	$query = '?user_id='.$user->id.'&cursor=1&count=10';
+    $url = 'https://api.twitter.com/1.1/followers/ids.json';
     $list = $twitter->setGetfield($query)->buildOauth($url, 'GET')->performRequest();
-    //echo json_decode($list)->users;
+    //print_r(json_decode($list));
 	
 	array_merge($users, json_decode($list)->users);
 	
@@ -75,11 +76,11 @@ function getSeedUsers($twitter, $letters, $numUsers=26){
 
 	$users = array();
 	$letter = 'A';
-	//foreach($letters as $letter) {
+	foreach($letters as $letter) {
 		$usersForLetter = getUsersForLetter($twitter, $letter, $usersToRequest);
 		$selectedUsers = selectUsersByStep($usersForLetter, $usersPerLetter, $stepBetweenUsers);
 	   $users = array_merge((array)$users, (array)$selectedUsers);
-	//}
+	}
 
 	echo 'Retrieved '.count($users).' users from searching by letters'."\n";
 	return $users;
@@ -121,6 +122,22 @@ function selectUsersByStep($users,$numOfUsersToSelect, $step){
 
 function printUsers($array) {
 	print_r($array);
+}
+
+function parseDateAndUrl($user) {
+	$locationStr = $user->location;
+	$arry = explode(", ", $locationStr);
+	$city = $arry[0];
+	$state = $arry[1];
+	$user->city = $city;
+	$user->state=$state;
+	
+	if ($user->url == null) {
+		$user->hasUrl = 0;
+	}
+	else {
+		$user->hasUrl = 1;
+	}
 }
 
 function addDateAttributesToUser($user) {
